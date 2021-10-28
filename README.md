@@ -17,7 +17,6 @@ To prepare a service account to execute these templates, execute the following s
     gcloud iam service-accounts create terraform-vault-unseal \
         --display-name "Vault unseal setup account"
 
-    ```bash
     gcloud iam service-accounts list
     ```
 
@@ -25,55 +24,26 @@ To prepare a service account to execute these templates, execute the following s
 
     ```bash
     SERVICE_ACCOUNT_EMAIL=$(gcloud iam service-accounts list \
-      --filter="displayName:Velero service account" \
+      --filter="displayName:Vault unseal setup account" \
       --format 'value(email)')
     ```
 
-3. Attach policies to enable the account to execute
+3. Assign roles to enable the account to execute
 
     ```bash
-    ROLE_PERMISSIONS=(
-      cloudkms.cryptoKeyVersions.create
-      cloudkms.cryptoKeyVersions.destroy
-      cloudkms.cryptoKeyVersions.get
-      cloudkms.cryptoKeyVersions.list
-      cloudkms.cryptoKeyVersions.restore
-      cloudkms.cryptoKeyVersions.update
-      cloudkms.cryptoKeyVersions.useToDecryptViaDelegation
-      cloudkms.cryptoKeyVersions.useToEncryptViaDelegation
-      cloudkms.cryptoKeys.*
-      cloudkms.importJobs.*
-      cloudkms.keyRings.*
-      cloudkms.locations.get
-      cloudkms.locations.list
-      resourcemanager.projects.get
-      cloudkms.cryptoKeyVersions.create
-      cloudkms.cryptoKeyVersions.get
-      cloudkms.cryptoKeyVersions.list
-      cloudkms.cryptoKey.create
-      cloudkms.cryptoKey.get
-      cloudkms.cryptoKey.list
-      cloudkms.keyRings.create
-      cloudkms.keyRings.get
-      cloudkms.locations.get
-      cloudkms.locations.list
-      resourcemanager.projects.get
-    )
-
-    gcloud iam roles create terraform.unseal \
-        --project $PROJECT_ID \
-        --title "Create/maintain vault auto-unseal infrastructure" \
-        --permissions "$(IFS=","; echo "${ROLE_PERMISSIONS[*]}")"
+    gcloud projects add-iam-policy-binding $PROJECT_ID \
+        --member serviceAccount:$SERVICE_ACCOUNT_EMAIL \
+        --role roles/cloudkms.admin
 
     gcloud projects add-iam-policy-binding $PROJECT_ID \
         --member serviceAccount:$SERVICE_ACCOUNT_EMAIL \
-        --role projects/$PROJECT_ID/roles/terraform.unseal
+        --role roles/iam.serviceAccountCreator
     ```
 
-4. Create the service account key and output the file to the `secerts` directory. 
+4. Create the service account key and output the file to the `secrets` directory. 
 
     ```bash
-    gcloud iam service-accounts keys create credentials-velero \
+    gcloud iam service-accounts keys create ${SECRETS_DIR}/vault-unseal.json \
         --iam-account $SERVICE_ACCOUNT_EMAIL
     ```
 
