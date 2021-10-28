@@ -1,2 +1,2 @@
-key_ring = "homelab"
+key_ring   = "homelab"
 crypto_key = "unseal"
