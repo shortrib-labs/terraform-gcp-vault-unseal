@@ -47,6 +47,24 @@ To prepare a service account to execute these templates, execute the following s
         --iam-account $SERVICE_ACCOUNT_EMAIL
     ```
 
+### Prepare a bucket for remote state storage
+
+To maintain Terraform state across systems and users, we'll use GCP to store the remote state.
+
+1. Create the bucket
+
+```bash
+BUCKET=<bucket name>
+
+gsutil mb gs://${BUCKET}
+gsutil versioning set on gs://${BUCKET}
+```
+
+2. Enable access
+
+```bash
+gsutil iam ch serviceAccount:${SERVICE_ACCOUNT_EMAIL}:objectAdmin gs://${BUCKET}
+```
 
 ### Check the variables
 
