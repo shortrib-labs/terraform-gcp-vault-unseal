@@ -31,6 +31,8 @@ To prepare a service account to execute these templates, execute the following s
 3. Assign roles to enable the account to execute
 
     ```bash
+    PROJECT_ID=$(gcloud config get-value project)
+
     gcloud projects add-iam-policy-binding $PROJECT_ID \
         --member serviceAccount:$SERVICE_ACCOUNT_EMAIL \
         --role roles/cloudkms.admin
@@ -38,6 +40,10 @@ To prepare a service account to execute these templates, execute the following s
     gcloud projects add-iam-policy-binding $PROJECT_ID \
         --member serviceAccount:$SERVICE_ACCOUNT_EMAIL \
         --role roles/iam.serviceAccountCreator
+
+    gcloud projects add-iam-policy-binding $PROJECT_ID \
+        --member serviceAccount:$SERVICE_ACCOUNT_EMAIL \
+        --role roles/iam.serviceAccountKeyAdmin
     ```
 
 4. Create the service account key and output the file to the `secrets` directory. 
