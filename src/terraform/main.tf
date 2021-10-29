@@ -3,6 +3,10 @@ resource "google_service_account" "vault_kms_service_account" {
   display_name = "Vault KMS for auto-unseal"
 }
 
+resource "google_service_account_key" "vault_kms_service_account" {
+  service_account_id = google_service_account.vault_kms_service_account.name
+}
+
 # Create a KMS key ring
 resource "google_kms_key_ring" "key_ring" {
   project  = var.project
@@ -25,4 +29,9 @@ resource "google_kms_key_ring_iam_binding" "vault_iam_kms_binding" {
   members = [
     "serviceAccount:${google_service_account.vault_kms_service_account.email}",
   ]
+}
+
+output "service_account_key" {
+  value     = google_service_account_key.vault_kms_service_account.private_key
+  sensitive = true
 }
